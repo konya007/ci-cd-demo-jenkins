@@ -9,7 +9,7 @@ pipeline {
         stage('Kiểm thử Pull Request vào Main') {
             when {
                 allOf {
-                    changeRequest true // Điều kiện này đúng nếu đây là một build của PR
+                    changeRequest true 
                     expression { return env.CHANGE_TARGET == 'main' } 
                 }
             }
@@ -22,7 +22,7 @@ pipeline {
             when {
                 allOf {
                     branch 'main'
-                    not { changeRequest true } // Đảm bảo đây không phải là build của PR
+                    not { changeRequest true } 
                 }
             }
             steps {
