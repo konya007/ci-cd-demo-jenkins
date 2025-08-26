@@ -57,13 +57,13 @@ pipeline {
 
     post {
         failure {
-            echo "❌ Pipeline thất bại. Vui lòng kiểm tra lại!"
+            echo " Pipeline failed. Please check the logs."
         }
         success {
-            echo "✅ Pipeline hoạt động thành công!"
+            echo " Pipeline succeeded!"
         }
         aborted {
-            echo "⚠️ Pipeline bị hủy."
+            echo " Pipeline was aborted."
         }
     }
 }
