@@ -1,44 +1,69 @@
 pipeline {
     agent any
+    options {
+        skipDefaultCheckout(false)
+    }
+
     stages {
-        stage('Cài đặt dependencies') {
+        stage('Install dependencies') {
             steps {
-                bat 'npm install'
+                bat 'npm ci || npm install'
             }
         }
-        stage('Kiểm thử Pull Request vào Main') {
+
+        stage('Test PR to main') {
             when {
                 allOf {
-                    changeRequest true 
-                    expression { return env.CHANGE_TARGET == 'main' } 
+                    changeRequest()                    
+                    expression { env.CHANGE_TARGET == 'main' } 
                 }
             }
             steps {
-                echo "Running unit tests for Pull Request targeting 'main' branch..."
+                echo "Running unit tests for Pull Request targeting 'main'..."
                 bat 'npm test'
             }
         }
-        stage('Build và Deploy từ Main') {
+
+        stage('Build') {
             when {
                 allOf {
                     branch 'main'
-                    not { changeRequest true } 
+                    not { changeRequest() } 
                 }
             }
             steps {
-                echo "Building and deploying from 'main' branch after merge..."
+                echo "Building project on main..."
                 bat 'npm run build'
+            }
+        }
+
+        stage('Deploy (Vercel)') {
+            when {
+                allOf {
+                    branch 'main'
+                    not { changeRequest() }
+                }
+            }
+            environment {
+                VERCEL_TOKEN = credentials('vercel-token')
+            }
+            steps {
+                echo "Deploying to Vercel production..."
                 bat 'npm install -g vercel'
                 bat 'npx vercel --prod --yes --token=%VERCEL_TOKEN% --name=ci-cd-demo'
             }
         }
     }
+
     post {
         failure {
             echo "❌ Pipeline thất bại. Vui lòng kiểm tra lại!"
         }
         success {
             echo "✅ Pipeline hoạt động thành công!"
+        }
+        aborted {
+            echo "⚠️ Pipeline bị hủy."
         }
     }
 }
