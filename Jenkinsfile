@@ -5,7 +5,20 @@ pipeline {
     }
 
     stages {
+        stage('Debug Info') {
+            steps {
+                echo "Branch: ${env.BRANCH_NAME}"
+                echo "Is PR: ${env.CHANGE_ID != null}"
+                echo "Target branch: ${env.CHANGE_TARGET}"
+            }
+        }
         stage('Install dependencies') {
+            when {
+                anyOf {
+                    changeRequest()
+                    branch 'main'
+                }
+            }
             steps {
                 bat 'npm ci || npm install'
             }
