@@ -9,7 +9,7 @@ const HomePage = () => {
   const [houses, setHouses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0); 
   const [searchParams, setSearchParams] = useSearchParams();
 
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
